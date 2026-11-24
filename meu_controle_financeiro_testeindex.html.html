@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123b35"><title>Meu Controle Financeiro</title>
+<style>
+:root{--green:#123b35;--mint:#e8f2ef;--bg:#f5f7f6;--ink:#172321;--muted:#65736f;--line:#dce5e1;--white:#fff;--red:#a43c35}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:36px}
+header{background:var(--green);color:white;padding:24px 18px 20px;padding-top:max(24px,env(safe-area-inset-top))}
+header h1{font-size:22px;margin:0 0 5px}header p{margin:0;color:#d2e2dc;font-size:13px}
+main{max-width:760px;margin:auto;padding:14px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:4px 0 16px}.metric{background:white;border:1px solid var(--line);border-radius:13px;padding:13px}.metric small{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:19px;margin-top:5px}
+nav{display:flex;gap:7px;overflow:auto;margin:12px 0}.tab{border:1px solid var(--line);background:white;border-radius:999px;padding:10px 14px;white-space:nowrap;color:var(--ink)}.tab.active{background:var(--green);color:white;border-color:var(--green)}
+.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;margin:12px 0}.panel h2{font-size:17px;margin:0 0 12px}
+label{display:block;font-size:13px;font-weight:600;margin:11px 0 5px}input,select,textarea{width:100%;border:1px solid #cbd7d2;border-radius:10px;padding:12px;font:inherit;background:#fff;color:var(--ink)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:10px;padding:12px 15px;font-weight:650;background:var(--green);color:white;margin-top:13px;width:100%;font-size:15px}.btn.secondary{background:var(--mint);color:var(--green)}.btn.danger{background:#f9e9e7;color:var(--red)}
+.loan{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0}.loan h3{font-size:16px;margin:0 0 7px}.muted{color:var(--muted);font-size:13px}.numbers{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.numbers div{background:var(--bg);padding:8px;border-radius:8px}.numbers small{display:block;color:var(--muted);font-size:11px}.numbers b{font-size:14px}
+.alert{padding:11px;border-radius:10px;background:#fff2dc;color:#704b0d;margin:8px 0;font-size:13px}.empty{color:var(--muted);text-align:center;padding:24px 8px}.actions{display:flex;gap:8px}.actions button{flex:1}.hidden{display:none!important}.foot{font-size:12px;color:var(--muted);line-height:1.45;padding:8px 3px}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.metric strong{font-size:17px}}
+</style></head>
+<body>
+<header><h1>Meu Controle Financeiro</h1><p>Seus empréstimos e recebimentos, organizados no iPhone</p></header>
+<main>
+<section class="cards">
+<div class="metric"><small>Principal emprestado</small><strong id="mPrincipal">R$ 0,00</strong></div>
+<div class="metric"><small>Juros previstos</small><strong id="mInterest">R$ 0,00</strong></div>
+<div class="metric"><small>Juros recebidos</small><strong id="mReceivedInterest">R$ 0,00</strong></div>
+<div class="metric"><small>Total ainda a receber</small><strong id="mPending">R$ 0,00</strong></div>
+</section>
+<div id="alerts"></div>
+<nav>
+<button class="tab active" data-tab="all">Visão geral</button><button class="tab" data-tab="ordinary">Comuns</button><button class="tab" data-tab="installment">Parcelados</button><button class="tab" data-tab="new">Cadastrar</button>
+</nav>
+<section id="view-all" class="panel"><h2>Seus empréstimos</h2><div id="allLoans"></div></section>
+<section id="view-ordinary" class="panel hidden"><h2>Empréstimos comuns</h2><div id="ordinaryLoans"></div></section>
+<section id="view-installment" class="panel hidden"><h2>Empréstimos parcelados</h2><div id="installmentLoans"></div></section>
+<section id="view-new" class="panel hidden">
+<h2>Novo empréstimo</h2>
+<form id="loanForm">
+<label>Tipo de empréstimo</label><select id="type"><option value="ordinary">Comum</option><option value="installment">Parcelado</option></select>
+<label>Nome do devedor</label><input id="person" required maxlength="70" placeholder="Nome completo">
+<div class="grid"><div><label>Valor emprestado (R$)</label><input id="principal" type="number" min="0.01" step=".01" required placeholder="1000"></div><div><label>Taxa de juros (%)</label><input id="rate" type="number" min="0" step=".01" required placeholder="30"></div></div>
+<label id="modeLabel">Como calcular os juros?</label><select id="mode"><option value="simple">Juros únicos sobre o principal</option><option value="compound">Juros compostos mensais (parcelas fixas)</option></select>
+<div id="installmentFields" class="hidden"><div class="grid"><div><label>Número de parcelas</label><input id="count" type="number" min="1" max="120" value="6"></div><div><label>Primeiro vencimento</label><input id="firstDue" type="date"></div></div></div>
+<div class="grid"><div><label>Data do acordo</label><input id="agreement" type="date"></div><div><label>Vencimento</label><input id="due" type="date"></div></div>
+<label>Observações</label><textarea id="notes" rows="2" placeholder="Opcional"></textarea>
+<div id="estimate" class="alert">Preencha valor e taxa para ver a simulação.</div>
+<button class="btn" type="submit">Salvar empréstimo</button>
+</form></section>
+<section class="panel"><h2>Dados e segurança</h2><p class="muted">Esta versão de teste guarda os dados neste navegador e neste aparelho. Não há sincronização, login nem backup automático. Se limpar os dados do Safari ou trocar de aparelho, os registros podem ser perdidos.</p>
+<div class="actions"><button class="btn secondary" id="exportBtn">Exportar cópia dos dados</button><button class="btn secondary" id="importBtn">Importar cópia</button></div><input id="importFile" type="file" accept="application/json" class="hidden">
+<p class="foot">Os avisos de vencimento aparecem nesta tela quando você abre o aplicativo. Notificações automáticas do iPhone ainda não estão ativadas nesta versão de teste.</p></section>
+<p class="foot">Protótipo de teste. Use dados fictícios inicialmente. A senha e a proteção de acesso ainda não estão implementadas.</p>
+</main>
+<script>
+const KEY='meuControleFinanceiro_v1';let loans=[];
+try{loans=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){loans=[]}
+const $=id=>document.getElementById(id), money=n=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}), today=()=>new Date().toISOString().slice(0,10);
+function save(){localStorage.setItem(KEY,JSON.stringify(loans));render()}
+function calc(l){
+ const p=+l.principal,r=+l.rate/100,n=+(l.count||1);
+ if(l.type==='ordinary'||l.mode==='simple')return p*(1+r);
+ if(r===0)return p;
+ return p*r/(1-Math.pow(1+r,-n))*n;
+}
+function interestTotal(l){return Math.max(0,calc(l)-(+l.principal))}
+function totals(l){let pi=+l.principal,ii=interestTotal(l),rp=0,ri=0;(l.payments||[]).forEach(x=>{let a=+x.amount, toI=Math.min(a,Math.max(0,ii-ri));ri+=toI;rp+=Math.max(0,a-toI)});return {pi,ii,rp,ri,pending:Math.max(0,pi+ii-rp-ri)}}
+function fmtDate(d){if(!d)return 'Não informado';return new Date(d+'T12:00:00').toLocaleDateString('pt-BR')}
+function loanCard(l){
+ let t=totals(l), due=l.type==='installment'?l.firstDue:l.due;
+ return `<article class="loan"><h3>${esc(l.person)} <span class="muted">· ${l.type==='installment'?'Parcelado':'Comum'}</span></h3><div class="muted">${l.rate}% de juros · Vencimento ${fmtDate(due)}</div>
+ <div class="numbers"><div><small>Principal</small><b>${money(t.pi)}</b></div><div><small>Juros previstos</small><b>${money(t.ii)}</b></div><div><small>Juros recebidos</small><b>${money(t.ri)}</b></div><div><small>Juros pendentes</small><b>${money(Math.max(0,t.ii-t.ri))}</b></div><div><small>Total recebido</small><b>${money(t.rp+t.ri)}</b></div><div><small>Saldo a receber</small><b>${money(t.pending)}</b></div></div>
+ ${l.type==='installment'?`<p class="muted">${l.count} parcelas · ${l.mode==='simple'?'Juros únicos':'Juros compostos mensais'} · Parcela estimada ${money(calc(l)/l.count)}</p>`:''}
+ ${l.notes?`<p class="muted">${esc(l.notes)}</p>`:''}
+ <p class="muted">Pagamentos registrados: ${(l.payments||[]).length}</p>
+ <div class="actions"><button class="btn" onclick="pay('${l.id}')">Registrar pagamento</button><button class="btn secondary" onclick="history('${l.id}')">Histórico</button></div>
+ <button class="btn danger" onclick="removeLoan('${l.id}')">Excluir empréstimo</button></article>`;
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ let sums=loans.reduce((a,l)=>{let t=totals(l);a.p+=t.pi;a.i+=t.ii;a.ri+=t.ri;a.pending+=t.pending;return a},{p:0,i:0,ri:0,pending:0});
+ $('mPrincipal').textContent=money(sums.p);$('mInterest').textContent=money(sums.i);$('mReceivedInterest').textContent=money(sums.ri);$('mPending').textContent=money(sums.pending);
+ $('allLoans').innerHTML=loans.length?loans.map(loanCard).join(''):'<div class="empty">Nenhum empréstimo cadastrado. Toque em “Cadastrar” para começar.</div>';
+ for(let [id,type] of [['ordinary','ordinary'],['installment','installment']]){let a=loans.filter(l=>l.type===type);$(''+id+'Loans').innerHTML=a.length?a.map(loanCard).join(''):'<div class="empty">Nenhum registro nesta categoria.</div>'}
+ let notices=[];loans.forEach(l=>{let d=l.type==='installment'?l.firstDue:l.due;if(!d||totals(l).pending<=0)return;let days=Math.ceil((new Date(d+'T12:00:00')-new Date(today()+'T12:00:00'))/86400000);if(days<0)notices.push(`${esc(l.person)}: vencido há ${-days} dia(s).`);else if(days===3||days===7)notices.push(`${esc(l.person)}: vence em ${days} dia(s).`)});$('alerts').innerHTML=notices.map(n=>`<div class="alert">${n}</div>`).join('');
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['all','ordinary','installment','new'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==b.dataset.tab))}));
+$('type').addEventListener('change',()=>{$('installmentFields').classList.toggle('hidden',$('type').value!=='installment');updateEstimate()});
+['principal','rate','count','mode'].forEach(id=>$(id).addEventListener('input',updateEstimate));
+function updateEstimate(){let p=+$('principal').value,r=+$('rate').value/100,n=+$('count').value||1,typ=$('type').value,mode=$('mode').value;let total=typ==='ordinary'||mode==='simple'?p*(1+r):(r===0?p:p*r/(1-Math.pow(1+r,-n))*n);$('estimate').textContent=p>0?`Juros estimados: ${money(total-p)} · Total: ${money(total)}${typ==='installment'?` · Parcela: ${money(total/n)}`:''}`:'Preencha valor e taxa para ver a simulação.'}
+$('loanForm').addEventListener('submit',e=>{e.preventDefault();let type=$('type').value,loan={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),type,person:$('person').value.trim(),principal:+$('principal').value,rate:+$('rate').value,mode:$('mode').value,count:type==='installment'?Math.max(1,+$('count').value):1,firstDue:$('firstDue').value,due:$('due').value,agreement:$('agreement').value,notes:$('notes').value.trim(),payments:[]};if(!loan.person||loan.principal<=0||loan.rate<0)return;loans.unshift(loan);save();e.target.reset();$('installmentFields').classList.add('hidden');$('estimate').textContent='Empréstimo salvo.';document.querySelector('[data-tab="all"]').click()});
+window.pay=id=>{let l=loans.find(x=>x.id===id);if(!l)return;let v=prompt(`Valor recebido de ${l.person} (R$):`);if(v===null)return;let amount=Number(v.replace(',','.'));if(!Number.isFinite(amount)||amount<=0){alert('Informe um valor válido.');return}let t=totals(l);if(amount>t.pending+0.005&&!confirm('O valor é maior que o saldo pendente. Registrar mesmo assim?'))return;l.payments.push({date:today(),amount});save();alert('Pagamento registrado. Para este controle, o recebimento é alocado primeiro aos juros pendentes e depois ao principal.')};
+window.history=id=>{let l=loans.find(x=>x.id===id);if(!l)return;let s=(l.payments||[]).map((p,i)=>`${i+1}. ${fmtDate(p.date)} — ${money(p.amount)}`).join('\n');alert(s||'Nenhum pagamento registrado.')};
+window.removeLoan=id=>{if(confirm('Excluir este empréstimo e seu histórico?')){loans=loans.filter(l=>l.id!==id);save()}};
+$('exportBtn').onclick=()=>{let blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),loans},null,2)],{type:'application/json'}),a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='backup-meu-controle-financeiro.json';a.click();URL.revokeObjectURL(url)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data.loans))throw Error();if(confirm('Importar substituirá os registros atuais. Continuar?')){loans=data.loans;save();alert('Cópia importada.')}}catch(err){alert('Arquivo inválido.')}e.target.value=''};
+render();updateEstimate();
+</script></body></html>
