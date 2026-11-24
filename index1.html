@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0c1d"><meta name="apple-mobile-web-app-capable" content="yes"><title>Meu Controle Financeiro</title>
+<style>
+:root{--bg:#0a0c1d;--card:#141838;--line:#2a2f66;--ink:#eef0ff;--muted:#8d93c4;--violet:#6d6bf5;--green:#2ee59d;--red:#ff4d5e;--amber:#ffb020}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:radial-gradient(900px 500px at 50% -10%,#1d2260 0,var(--bg) 60%) fixed;color:var(--ink);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;padding:max(18px,env(safe-area-inset-top)) 18px 6px;max-width:760px;margin:auto}
+header h1{font-size:20px;margin:0;font-weight:750;letter-spacing:-.3px}header p{margin:2px 0 0;color:var(--muted);font-size:13px}
+main{max-width:760px;margin:auto;padding:10px 14px}
+h2{font-size:12px;letter-spacing:.4px;color:var(--muted);margin:20px 2px 9px;font-weight:650}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.card{background:linear-gradient(145deg,#1a1f4d,#11143a);border:1px solid var(--line);border-radius:15px;padding:14px;margin-bottom:9px}
+.big{padding:16px}.big small{display:block;color:var(--muted);font-size:12px}.big strong{display:block;font-size:26px;margin-top:5px;letter-spacing:-.5px}
+.st small{display:block;color:var(--muted);font-size:11.5px}.st strong{display:block;font-size:17px;margin-top:4px}
+.green strong,.g{color:var(--green)}.red strong,.r{color:var(--red)}.amber strong,.a{color:var(--amber)}
+.card.red{background:linear-gradient(145deg,#3a1226,#1d0d22);border-color:#6b2038}.card.green{border-color:#1d6b55}
+.alert{padding:11px 13px;border-radius:12px;background:#2b2210;border:1px solid #6b5316;color:#ffd98a;margin:0 0 8px;font-size:13px}
+.alert.bad{background:#34121c;border-color:#7a2336;color:#ffb3bc}
+label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 5px;color:var(--muted)}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;font:inherit;background:#0d1031;color:var(--ink);outline:0}
+input:focus,select:focus,textarea:focus{border-color:var(--violet)}
+.btn{border:0;border-radius:11px;padding:12px 14px;font:inherit;font-weight:650;background:var(--violet);color:#fff;margin-top:12px;width:100%}
+.btn.sec{background:#222763;color:#cfd2ff}.btn.danger{background:#3a1520;color:#ff8f9c}.btn.wa{background:#1fa463}.btn.sm{padding:9px 12px;margin:0;width:auto}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.seg{display:flex;gap:8px;margin:4px 0 12px}.seg button{flex:1;border:1px solid var(--line);background:#141838;color:var(--muted);padding:11px 6px;border-radius:11px;font:inherit;font-weight:650}
+.seg button.on{background:var(--violet);color:#fff;border-color:var(--violet)}.seg button.on.late{background:var(--red);border-color:var(--red)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.top h3{margin:0;font-size:16px}
+.muted{color:var(--muted);font-size:12.5px}.chip{font-size:11px;padding:3px 9px;border-radius:99px;font-weight:700;white-space:nowrap}
+.chip.r{background:#3a1520}.chip.a{background:#33260c}.chip.g{background:#0f3328}.chip.v{background:#25286b;color:#bfc2ff}
+.nums{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.nums div{background:#0d1031;padding:8px 10px;border-radius:9px}.nums small{display:block;color:var(--muted);font-size:11px}.nums b{font-size:13.5px}
+.av{width:42px;height:42px;border-radius:50%;background:#25286b;display:grid;place-items:center;font-weight:750;color:#bfc2ff;flex:none}
+.cli{display:flex;gap:12px;align-items:center;width:100%;text-align:left;color:inherit;font:inherit}
+.empty{color:var(--muted);text-align:center;padding:26px 8px}.foot{font-size:12px;color:var(--muted);line-height:1.5}
+.hidden{display:none!important}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(10,12,29,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:none;border:0;color:var(--muted);font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 10px}
+nav button b{font-size:19px;line-height:1}nav button.on{color:#fff}nav button.on b{color:var(--violet)}
+nav .fab{width:52px;height:52px;border-radius:50%;background:var(--violet);color:#fff;font-size:28px;margin-top:-26px;box-shadow:0 6px 20px rgba(109,107,245,.5);padding:0;justify-content:center;flex-direction:row}
+#modal{position:fixed;inset:0;background:rgba(3,4,14,.7);display:none;align-items:flex-end;justify-content:center;z-index:10}
+#modal.open{display:flex}
+#sheet{background:#11143a;border:1px solid var(--line);border-radius:22px 22px 0 0;width:100%;max-width:760px;max-height:88vh;overflow:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+#sheet h3{margin:0 0 10px;font-size:17px}
+#msgBox{min-height:170px;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.x{float:right;background:#222763;border:0;color:#fff;border-radius:50%;width:30px;height:30px;font-size:16px}
+@media(max-width:380px){.grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div><h1>Meu Controle Financeiro</h1><p id="hello">Seus empréstimos e cobranças</p></div></header>
+<main>
+<section id="v-painel">
+ <div id="avisos"></div><div id="painel"></div>
+ <h2>Seus empréstimos</h2><div id="allLoans"></div>
+</section>
+<section id="v-clientes" class="hidden"><h2>Clientes</h2><div id="clientes"></div></section>
+<section id="v-cob" class="hidden">
+ <h2>Cobranças</h2><p class="muted" id="cobSub" style="margin:-4px 2px 12px"></p>
+ <div class="seg" id="seg"></div><div class="grid" id="cobStats"></div><h2>Parcelas</h2><div id="cobList"></div>
+</section>
+<section id="v-novo" class="hidden">
+ <h2>Novo empréstimo</h2>
+ <form id="loanForm" class="card">
+  <label>Tipo de empréstimo</label><select id="type"><option value="ordinary">Comum</option><option value="installment">Parcelado</option></select>
+  <label>Nome do cliente</label><input id="person" required maxlength="70" placeholder="Nome completo">
+  <label>WhatsApp do cliente</label><input id="phone" type="tel" maxlength="20" placeholder="(21) 98888-0001">
+  <div class="grid"><div><label>Valor emprestado (R$)</label><input id="principal" type="number" inputmode="decimal" min="0.01" step=".01" required placeholder="1000"></div><div><label>Taxa de juros (%)</label><input id="rate" type="number" inputmode="decimal" min="0" step=".01" required placeholder="30"></div></div>
+  <div id="modeWrap" class="hidden"><label>Como calcular os juros?</label><select id="mode"><option value="simple">Juros únicos sobre o principal</option><option value="compound">Juros compostos mensais (parcelas fixas)</option></select></div>
+  <div id="instFields" class="hidden"><div class="grid"><div><label>Número de parcelas</label><input id="count" type="number" min="1" max="120" value="6"></div><div><label>Primeiro vencimento</label><input id="firstDue" type="date"></div></div></div>
+  <div class="grid"><div><label>Data do acordo</label><input id="agreement" type="date"></div><div id="dueWrap"><label>Vencimento</label><input id="due" type="date"></div></div>
+  <label>Observações</label><textarea id="notes" rows="2" placeholder="Opcional"></textarea>
+  <div id="estimate" class="alert" style="margin-top:12px">Preencha valor e taxa para ver a simulação.</div>
+  <button class="btn" type="submit">Salvar empréstimo</button>
+ </form>
+</section>
+<section id="v-mais" class="hidden">
+ <h2>Dados e segurança</h2>
+ <div class="card"><p class="muted" style="margin-top:0">Esta versão guarda os dados neste navegador e neste aparelho. Não há sincronização, login nem backup automático. Se limpar os dados do Safari ou trocar de aparelho, os registros podem ser perdidos.</p>
+ <div class="row"><button class="btn sec" id="exportBtn">Exportar cópia</button><button class="btn sec" id="importBtn">Importar cópia</button></div><input id="importFile" type="file" accept="application/json" class="hidden">
+ <p class="foot">Os avisos de vencimento aparecem no Painel quando você abre o aplicativo. Notificações automáticas do iPhone ainda não estão ativadas. Use dados fictícios para testar.</p></div>
+</section>
+</main>
+<nav>
+ <button data-t="painel" class="on"><b>▦</b>Painel</button><button data-t="clientes"><b>☺</b>Clientes</button>
+ <button class="fab" data-t="novo" aria-label="Novo empréstimo">+</button>
+ <button data-t="cob"><b>◔</b>Cobranças</button><button data-t="mais"><b>⋯</b>Mais</button>
+</nav>
+<div id="modal"><div id="sheet"><div id="mBody"></div></div></div>
+<script>
+const KEY='meuControleFinanceiro_v1';let loans=[],tab='painel',filter='hoje',openClient=null;
+try{loans=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){loans=[]}
+const $=id=>document.getElementById(id),money=n=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>iso(new Date()),dt=s=>new Date(s+'T12:00:00'),diff=s=>Math.round((dt(s)-dt(today()))/86400000);
+const addM=(s,m)=>{const d=dt(s),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+m);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return iso(d)};
+const fmtDate=d=>d?dt(d).toLocaleDateString('pt-BR'):'Não informado';
+function save(){localStorage.setItem(KEY,JSON.stringify(loans));render()}
+function calc(l){const p=+l.principal,r=+l.rate/100,n=+(l.count||1);if(l.type==='ordinary'||l.mode==='simple')return p*(1+r);if(r===0)return p;return p*r/(1-Math.pow(1+r,-n))*n}
+const interestTotal=l=>Math.max(0,calc(l)-(+l.principal));
+function totals(l){let pi=+l.principal,ii=interestTotal(l),rp=0,ri=0;(l.payments||[]).forEach(x=>{let a=+x.amount,toI=Math.min(a,Math.max(0,ii-ri));ri+=toI;rp+=Math.max(0,a-toI)});return{pi,ii,rp,ri,pending:Math.max(0,pi+ii-rp-ri)}}
+function nextInst(l){
+ const t=totals(l);if(t.pending<=0.005)return null;
+ if(l.type==='installment'){const n=+l.count||1,inst=calc(l)/n,rec=t.rp+t.ri,paid=Math.min(n-1,Math.floor((rec+0.005)/inst));if(!l.firstDue)return null;return{idx:paid+1,n,due:addM(l.firstDue,paid),amount:Math.max(0,inst*(paid+1)-rec)}}
+ return l.due?{idx:1,n:1,due:l.due,amount:t.pending}:null}
+function dues(){return loans.map(l=>{const nx=nextInst(l);return nx?{l,nx,days:diff(nx.due)}:null}).filter(Boolean).sort((a,b)=>a.days-b.days)}
+function stats(){const s={aberto:0,rec:0,atraso:0,cap:0,ativos:0,ji:0,jr:0};
+ loans.forEach(l=>{const t=totals(l);s.aberto+=t.pending;s.rec+=t.rp+t.ri;s.jr+=t.ri;s.ji+=Math.max(0,t.ii-t.ri);if(t.pending>0.005){s.ativos++;s.cap+=Math.max(0,t.pi-t.rp)}});
+ dues().forEach(d=>{if(d.days<0)s.atraso+=d.nx.amount});return s}
+const st=(label,val,cls='')=>`<div class="card st ${cls}"><small>${label}</small><strong>${val}</strong></div>`;
+function badge(days){return days<0?`<span class="chip r">${-days} dia(s) em atraso</span>`:days===0?'<span class="chip a">Vence hoje</span>':`<span class="chip v">Vence em ${days} dia(s)</span>`}
+function loanCard(l){
+ const t=totals(l),nx=nextInst(l);
+ return `<article class="card"><div class="top"><div><h3>${esc(l.person)}</h3><div class="muted">${l.type==='installment'?'Parcelado':'Comum'} · ${l.rate}% de juros</div></div>${nx?badge(diff(nx.due)):'<span class="chip g">Quitado</span>'}</div>
+ ${nx?`<p class="muted" style="margin:8px 0 0">Próxima: parcela ${nx.idx}/${nx.n} · ${fmtDate(nx.due)} · ${money(nx.amount)}</p>`:''}
+ <div class="nums"><div><small>Principal</small><b>${money(t.pi)}</b></div><div><small>Juros previstos</small><b>${money(t.ii)}</b></div><div><small>Juros recebidos</small><b class="g">${money(t.ri)}</b></div><div><small>Saldo a receber</small><b class="a">${money(t.pending)}</b></div></div>
+ ${l.type==='installment'?`<p class="muted">${l.count} parcelas · ${l.mode==='simple'?'Juros únicos':'Juros compostos mensais'} · Parcela estimada ${money(calc(l)/l.count)}</p>`:''}
+ ${l.notes?`<p class="muted">${esc(l.notes)}</p>`:''}
+ <div class="row"><button class="btn" onclick="pay('${l.id}')">Registrar pagamento</button><button class="btn sec" onclick="hist('${l.id}')">Histórico</button></div>
+ <div class="row">${nx?`<button class="btn wa" onclick="cobrar('${l.id}')">Cobrar</button>`:''}<button class="btn danger" onclick="removeLoan('${l.id}')">Excluir</button></div></article>`}
+function render(){
+ const s=stats(),ds=dues(),hoje=ds.filter(d=>d.days===0),atr=ds.filter(d=>d.days<0),prox=ds.filter(d=>d.days>0&&d.days<=7);
+ $('painel').innerHTML=`<h2>Visão geral</h2>
+ <div class="card big"><small>Total em aberto</small><strong>${money(s.aberto)}</strong></div>
+ <div class="card big green"><small>Total recebido</small><strong class="g">${money(s.rec)}</strong></div>
+ <div class="card big red"><small>Total em atraso</small><strong>${money(s.atraso)}</strong></div>
+ <h2>Empréstimos</h2><div class="grid">${st('Capital na rua',money(s.cap),'a')}${st('Empréstimos ativos',s.ativos)}${st('Juros a receber',money(s.ji))}${st('Juros recebidos',money(s.jr),'green')}</div>`;
+ let av=[];if(atr.length)av.push(`<div class="alert bad">${atr.length} parcela(s) em atraso · ${money(atr.reduce((a,d)=>a+d.nx.amount,0))}</div>`);
+ if(hoje.length)av.push(`<div class="alert">${hoje.length} parcela(s) vencem hoje</div>`);
+ const am=ds.filter(d=>d.days===1);if(am.length)av.push(`<div class="alert">${am.length} parcela(s) vencem amanhã</div>`);
+ $('avisos').innerHTML=av.join('');
+ $('allLoans').innerHTML=loans.length?loans.map(loanCard).join(''):'<div class="empty">Nenhum empréstimo cadastrado. Toque no + para começar.</div>';
+ // clientes
+ const g={};loans.forEach(l=>{const k=l.person.trim().toLowerCase();(g[k]=g[k]||[]).push(l)});
+ $('clientes').innerHTML=Object.keys(g).length?Object.entries(g).map(([k,a])=>{const sal=a.reduce((x,l)=>x+totals(l).pending,0),late=ds.some(d=>d.days<0&&d.l.person.trim().toLowerCase()===k),ph=a.map(l=>l.phone).find(Boolean);
+  return `<button class="card cli" onclick="showClient('${encodeURIComponent(k)}')"><div class="av">${esc(a[0].person[0].toUpperCase())}</div><div style="flex:1"><b>${esc(a[0].person)}</b><div class="muted">${esc(ph||'Sem WhatsApp')} · ${a.length} contrato(s)</div></div><div style="text-align:right"><b>${money(sal)}</b><div>${late?'<span class="chip r">Em atraso</span>':sal>0?'<span class="chip g">Em dia</span>':'<span class="chip v">Quitado</span>'}</div></div></button>`}).join(''):'<div class="empty">Seus clientes aparecem aqui depois do primeiro empréstimo.</div>';
+ // cobranças
+ const sum=a=>a.reduce((x,d)=>x+d.nx.amount,0);
+ $('cobSub').textContent=`Acompanhe parcelas em dia, vencendo e em atraso · ${hoje.length+atr.length+prox.length} pendência(s)`;
+ $('seg').innerHTML=[['hoje','Hoje',hoje.length],['atrasados','Atrasados',atr.length],['proximos','Próx. 7 dias',prox.length]].map(([k,n,c])=>`<button class="${filter===k?'on':''} ${k==='atrasados'?'late':''}" onclick="setFilter('${k}')">${n} (${c})</button>`).join('');
+ $('cobStats').innerHTML=st('Vencem hoje',hoje.length)+st('Parcelas atrasadas',atr.length,'red')+st('Total em atraso',money(sum(atr)),'red')+st('A cobrar no período',money(sum(hoje)+sum(atr)+sum(prox)),'a');
+ const list={hoje,atrasados:atr,proximos:prox}[filter];
+ $('cobList').innerHTML=list.length?list.map(d=>`<div class="card"><div class="top"><div><h3>${esc(d.l.person)}</h3><div class="muted">Parcela ${d.nx.idx}/${d.nx.n} · ${fmtDate(d.nx.due)}</div></div>${badge(d.days)}</div><div class="top" style="align-items:center;margin-top:10px"><b style="font-size:18px">${money(d.nx.amount)}</b><button class="btn wa sm" onclick="cobrar('${d.l.id}')">Cobrar</button></div></div>`).join(''):'<div class="empty">Nada para cobrar nesta lista.</div>';
+ if(openClient){const a=g[openClient];if(a)$('mBody').innerHTML=clientHtml(a);else closeModal()}
+}
+function go(t){tab=t;['painel','clientes','cob','novo','mais'].forEach(x=>$('v-'+x).classList.toggle('hidden',x!==t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t&&!b.classList.contains('fab')));scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+window.setFilter=k=>{filter=k;render()};
+function modal(html){$('mBody').innerHTML=html;$('modal').classList.add('open')}
+function closeModal(){openClient=null;$('modal').classList.remove('open')}
+$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+const clientHtml=a=>`<button class="x" onclick="closeModal()">✕</button><h3>${esc(a[0].person)}</h3><p class="muted">${esc(a.map(l=>l.phone).find(Boolean)||'Sem WhatsApp cadastrado')} · ${a.length} contrato(s)</p>${a.map(loanCard).join('')}`;
+window.showClient=k=>{openClient=decodeURIComponent(k);render();$('modal').classList.add('open')};
+function waLink(l,msg){let n=(l.phone||'').replace(/\D/g,'');if(n&&n.length<=11)n='55'+n;return `https://wa.me/${n}?text=${encodeURIComponent(msg)}`}
+window.cobrar=id=>{const l=loans.find(x=>x.id===id),nx=nextInst(l);if(!nx)return;const days=diff(nx.due),
+ s=days<0?`está vencida há ${-days} dia(s)`:days===0?'vence hoje':`vence em ${days} dia(s)`;
+ const msg=`Olá, ${l.person}.\n\n${days<0?'Precisamos tratar de uma pendência importante. ':'Passando para lembrar do seu pagamento. '}A parcela abaixo ${s}.\n\nParcela: ${nx.idx}/${nx.n}\nValor: ${money(nx.amount)}\nVencimento: ${fmtDate(nx.due)}\n\nPode nos confirmar o pagamento?`;
+ openClient=null;modal(`<button class="x" onclick="closeModal()">✕</button><h3>Cobrança via WhatsApp</h3><div class="alert ${days<0?'bad':''}"><b>Parcela ${nx.idx}/${nx.n}</b> · ${money(nx.amount)}<br>${badge(days).replace(/<[^>]+>/g,'')}</div><label>Enviar para</label><input value="${esc(l.person)} — ${esc(l.phone||'sem número')}" disabled><label>Mensagem</label><textarea id="msgBox">${esc(msg)}</textarea><div class="row"><button class="btn wa" onclick="window.open(waLink(loans.find(x=>x.id==='${id}'),$('msgBox').value),'_blank')">Abrir no WhatsApp</button><button class="btn sec" onclick="copyMsg()">Copiar</button></div>`)};
+window.copyMsg=async()=>{try{await navigator.clipboard.writeText($('msgBox').value)}catch(e){$('msgBox').select();document.execCommand('copy')}alert('Mensagem copiada.')};
+window.pay=id=>{const l=loans.find(x=>x.id===id);if(!l)return;const v=prompt(`Valor recebido de ${l.person} (R$):`);if(v===null)return;const amount=Number(v.replace(',','.'));if(!Number.isFinite(amount)||amount<=0){alert('Informe um valor válido.');return}
+ if(amount>totals(l).pending+0.005&&!confirm('O valor é maior que o saldo pendente. Registrar mesmo assim?'))return;l.payments=l.payments||[];l.payments.push({date:today(),amount});save();alert('Pagamento registrado. O recebimento é alocado primeiro aos juros pendentes e depois ao principal.')};
+window.hist=id=>{const l=loans.find(x=>x.id===id);if(!l)return;alert((l.payments||[]).map((p,i)=>`${i+1}. ${fmtDate(p.date)} — ${money(p.amount)}`).join('\n')||'Nenhum pagamento registrado.')};
+window.removeLoan=id=>{if(confirm('Excluir este empréstimo e seu histórico?')){loans=loans.filter(l=>l.id!==id);save()}};
+function updateEstimate(){const p=+$('principal').value,r=+$('rate').value/100,n=+$('count').value||1,typ=$('type').value,mode=$('mode').value;
+ const total=typ==='ordinary'||mode==='simple'?p*(1+r):(r===0?p:p*r/(1-Math.pow(1+r,-n))*n);
+ $('estimate').textContent=p>0?`Juros estimados: ${money(total-p)} · Total: ${money(total)}${typ==='installment'?` · Parcela: ${money(total/n)}`:''}`:'Preencha valor e taxa para ver a simulação.'}
+$('type').onchange=()=>{const i=$('type').value==='installment';$('instFields').classList.toggle('hidden',!i);$('modeWrap').classList.toggle('hidden',!i);$('dueWrap').classList.toggle('hidden',i);updateEstimate()};
+['principal','rate','count','mode'].forEach(id=>$(id).addEventListener('input',updateEstimate));
+$('loanForm').addEventListener('submit',e=>{e.preventDefault();const type=$('type').value,
+ loan={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),type,person:$('person').value.trim(),phone:$('phone').value.trim(),principal:+$('principal').value,rate:+$('rate').value,mode:type==='installment'?$('mode').value:'simple',count:type==='installment'?Math.max(1,+$('count').value):1,firstDue:$('firstDue').value,due:$('due').value,agreement:$('agreement').value,notes:$('notes').value.trim(),payments:[]};
+ if(!loan.person||loan.principal<=0||loan.rate<0)return;loans.unshift(loan);save();
+ const tot=calc(loan),msg=`Olá, ${loan.person}.\n\nSeu empréstimo foi registrado com sucesso!\n\nValor principal: ${money(loan.principal)}\nJuros: ${loan.rate}%\n${type==='installment'?`Parcelas: ${loan.count}x de ${money(tot/loan.count)}\n`:''}Total: ${money(tot)}`;
+ e.target.reset();$('instFields').classList.add('hidden');$('modeWrap').classList.add('hidden');$('dueWrap').classList.remove('hidden');updateEstimate();go('painel');
+ modal(`<button class="x" onclick="closeModal()">✕</button><h3>Empréstimo registrado com sucesso!</h3><label>Recibo (editável)</label><textarea id="msgBox">${esc(msg)}</textarea><button class="btn wa" onclick="window.open(waLink(loans.find(x=>x.id==='${loan.id}'),$('msgBox').value),'_blank')">Enviar no WhatsApp</button><button class="btn sec" onclick="copyMsg()">Copiar</button>`)});
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),loans},null,2)],{type:'application/json'}),a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='backup-meu-controle-financeiro.json';a.click();URL.revokeObjectURL(url)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.loans))throw Error();if(confirm('Importar substituirá os registros atuais. Continuar?')){loans=data.loans;save();alert('Cópia importada.')}}catch(err){alert('Arquivo inválido.')}e.target.value=''};
+render();updateEstimate();
+</script></body></html>
